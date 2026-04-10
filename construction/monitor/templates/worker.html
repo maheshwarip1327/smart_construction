@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Worker Management</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background: linear-gradient(to right, #eef2f3, #ffffff);
+}
+
+.container {
+    max-width: 900px;
+}
+
+.card {
+    border-radius: 15px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+h2 {
+    font-weight: bold;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+.worker-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    font-size: 14px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <!-- Title -->
+    <h2 class="text-center mb-4">👷 Worker Management</h2>
+
+    <!-- Home Button -->
+    <div class="text-center mb-3">
+        <a href="/" class="btn btn-dark">🏠 Home</a>
+    </div>
+
+    <!-- Form -->
+    <div class="card shadow p-4 mb-4">
+        <form method="post">
+            {% csrf_token %}
+
+            <input name="name" placeholder="Worker Name" class="form-control mb-3" required>
+
+            <input name="task" placeholder="Assigned Task" class="form-control mb-3" required>
+
+            <button class="btn btn-success w-100">➕ Add Worker</button>
+        </form>
+    </div>
+
+    <!-- Total Workers -->
+    <div class="alert alert-info text-center">
+        <strong>Total Workers:</strong> {{ data|length }}
+    </div>
+
+    <!-- Worker List -->
+    <h4 class="mb-3">📋 Worker List</h4>
+
+    {% for i in data %}
+    <div class="card p-3 mb-2 shadow-sm worker-item">
+        <span><strong>{{ i.name }}</strong></span>
+        <span class="badge bg-success">{{ i.task }}</span>
+    </div>
+    {% empty %}
+    <div class="alert alert-warning text-center">
+        No workers added yet!
+    </div>
+    {% endfor %}
+
+</div>
+
+</body>
+</html>
