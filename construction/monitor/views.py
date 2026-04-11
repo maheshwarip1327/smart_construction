@@ -1,89 +1,163 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Project, Worker, Material, Budget
 
+
+# 🏠 HOME
 def home(request):
     return render(request, 'home.html')
 
+
+# 📁 PROJECT
 def project(request):
     if request.method == "POST":
-        name = request.POST['name']
-        progress = request.POST['progress']
-        Project.objects.create(name=name, progress=progress)
-        return redirect('/project/')
-    
+        name = request.POST.get('name')
+        progress = request.POST.get('progress')
+
+        try:
+            progress = int(progress)
+        except (TypeError, ValueError):
+            progress = 0
+
+        if name:
+            Project.objects.create(name=name, progress=progress)
+
+        return redirect('project')   # ✅ better than '/project/'
+
     data = Project.objects.all()
     return render(request, 'project.html', {'data': data})
 
-def worker(request):
+
+# ✏️ EDIT PROJECT
+def edit_project(request, id):
+    project = get_object_or_404(Project, id=id)
+
     if request.method == "POST":
-        name = request.POST['name']
-        task = request.POST['task']
-        Worker.objects.create(name=name, task=task)
-        return redirect('/worker/')
-    
-    data = Worker.objects.all()
-    return render(request, 'worker.html', {'data': data})
-def convert_amount(value):
-    value = value.lower().strip()
-
-    if "k" in value:
-        return int(float(value.replace("k", "")) * 1000)
-
-    elif "lakh" in value or "lks" in value or "lk" in value:
-        value = value.replace("lakh", "").replace("lks", "").replace("lk", "")
-        return int(float(value) * 100000)
-
-    elif "cr" in value:
-        return int(float(value.replace("cr", "")) * 10000000)
-
-    else:
-        return int(value)
-
-
-def budget(request):
-    if request.method == 'POST':
-        amount_input = request.POST.get('amount')
-        desc = request.POST.get('desc')
+        project.name = request.POST.get('name')
 
         try:
-            amount = convert_amount(amount_input)
+            project.progress = int(request.POST.get('progress', 0))
+        except (TypeError, ValueError):
+            project.progress = 0
 
-            Budget.objects.create(
-                amount=amount,
-                desc=desc
-            )
+        project.save()
+        return redirect('project')
 
-        except Exception as e:
-            print("ERROR:", e)   # 🔥 debugging
+    return render(request, 'edit.html', {'project': project})
 
-    data = Budget.objects.all()
 
+# 🗑 DELETE PROJECT
+def delete_project(request, id):
+    project = get_object_or_404(Project, id=id)
+    project.delete()
+    return redirect('project')
+
+
+# 👷 WORKER
+def worker(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        task = request.POST.get('task')
+
+        if name and task:
+            Worker.objects.create(name=name, task=task)
+
+        return redirect('worker')
+
+    data = Worker.objects.all()
+    return render(request, 'worker.html', {'data': data})
+
+
+# 🗑 DELETE WORKER
+def delete_worker(request, id):
+    worker = get_object_or_404(Worker, id=id)
+    worker.delete()
+    return redirect('worker')
+
+
+# 🧱 MATERIAL
+def material(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        quantity = request.POST.get('quantity')
+
+        if name and quantity:
+            Material.objects.create(name=name, quantity=quantity)
+
+        return redirect('material')
+
+    data = Material.objects.all()
+    return render(request, 'material.html', {'data': data})
+def delete_material(request, id):
+    obj = Material.objects.get(id=id)
+    obj.delete()
+    return redirect('/material/')
+
+def budget(request):
+    project = Project.objects.first()
+
+    if not project:
+        return render(request, 'budget.html', {
+            'data': [],
+            'total': 0
+        })
+
+    # 🔥 ADD EXPENSE
+    if request.method == "POST":
+        desc = request.POST.get('desc')
+        amount = request.POST.get('amount')
+
+        if desc and amount:
+            desc = desc.lower()
+
+            try:
+                amount = int(amount)
+            except:
+                amount = 0
+
+            obj = Budget.objects.filter(project=project, desc=desc).first()
+
+            if obj:
+                obj.amount += amount
+                obj.save()
+            else:
+                Budget.objects.create(
+                    project=project,
+                    desc=desc,
+                    amount=amount
+                )
+
+        return redirect('/budget/')
+
+    data = Budget.objects.filter(project=project)
+
+    # 🔥 NORMAL TOTAL
     total = sum(i.amount for i in data)
+
+    # 🔥 RESET CHECK
+    if request.session.get('reset'):
+        total = 0
 
     return render(request, 'budget.html', {
         'data': data,
         'total': total
     })
-def material(request):
-    if request.method == "POST":
-        name = request.POST['name']
-        quantity = request.POST['quantity']
-        Material.objects.create(name=name, quantity=quantity)
-        return redirect('/material/')
-    
-    data = Material.objects.all()
-    return render(request, 'material.html', {'data': data})
 
 
+# 🔥 RESET FUNCTION
+def reset_budget(request):
+    request.session['reset'] = True
+    return redirect('/budget/')
+# 🗑 DELETE BUDGET
+def delete_budget(request, id):
+    budget = get_object_or_404(Budget, id=id)
+    budget.delete()
+    return redirect('budget')
+
+# 📊 DASHBOARD
 def dashboard(request):
-    projects = Project.objects.count()
-    workers = Worker.objects.count()
-    materials = Material.objects.count()
-    budgets = Budget.objects.count()
-
     return render(request, 'dashboard.html', {
-        'projects': projects,
-        'workers': workers,
-        'materials': materials,
-        'budgets': budgets
+        'projects': Project.objects.count(),
+        'workers': Worker.objects.count(),
+        'materials': Material.objects.count(),
+        'budgets': Budget.objects.count()
     })

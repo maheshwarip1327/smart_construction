@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 800px;
 }
 
 .card {
@@ -40,6 +40,13 @@ h2 {
 .badge {
     font-size: 15px;
 }
+
+.qty-box {
+    background: #3498db;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
 </style>
 
 </head>
@@ -48,40 +55,62 @@ h2 {
 
 <div class="container mt-5">
 
-    <!-- Title -->
+    <!-- TITLE -->
     <h2 class="text-center mb-4">📦 Material Inventory</h2>
 
-    <!-- Home Button -->
+    <!-- NAVIGATION -->
     <div class="text-center mb-3">
-        <a href="/" class="btn btn-dark">Home</a>
+        <a href="/" class="btn btn-dark">🏠 Home</a>
+        <a href="/dashboard/" class="btn btn-secondary">📊 Dashboard</a>
     </div>
 
-    <!-- Form -->
+    <!-- ADD MATERIAL -->
     <div class="card shadow p-4 mb-4">
         <form method="post">
             {% csrf_token %}
 
-            <input name="name" placeholder="Material Name" class="form-control mb-3" required>
+            <input name="name" placeholder="Material Name"
+                   class="form-control mb-3" required>
 
-            <input name="quantity" type="number" placeholder="Quantity" class="form-control mb-3" required>
+            <input name="quantity" type="number"
+                   placeholder="Quantity"
+                   class="form-control mb-3" required>
 
-            <button class="btn btn-warning w-100">➕ Add Material</button>
+            <button class="btn btn-warning w-100">
+                ➕ Add Material
+            </button>
         </form>
     </div>
 
-    <!-- Total Materials -->
+    <!-- TOTAL -->
     <div class="alert alert-info text-center">
         <strong>Total Materials:</strong> {{ data|length }}
     </div>
 
-    <!-- Material List -->
+    <!-- LIST -->
     <h4 class="mb-3">📋 Available Materials</h4>
 
     {% for i in data %}
     <div class="card p-3 mb-2 shadow-sm material-item">
+
+        <!-- NAME -->
         <span><strong>{{ i.name }}</strong></span>
-        <span class="badge bg-primary">Qty: {{ i.quantity }}</span>
+
+        <!-- RIGHT SIDE -->
+        <div class="d-flex align-items-center gap-2">
+
+            <!-- QUANTITY -->
+            <span class="qty-box">Qty: {{ i.quantity }}</span>
+
+            <form action="{% url 'delete_material' i.id %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button class="btn btn-danger btn-sm">🗑</button>
+</form>
+
+        </div>
+
     </div>
+
     {% empty %}
     <div class="alert alert-warning text-center">
         No materials added yet!

@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 800px;
 }
 
 .card {
@@ -31,14 +31,18 @@ h2 {
     transform: scale(1.05);
 }
 
-.worker-item {
+.worker-box {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.badge {
-    font-size: 14px;
+.task-badge {
+    background: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 13px;
 }
 </style>
 
@@ -48,40 +52,61 @@ h2 {
 
 <div class="container mt-5">
 
-    <!-- Title -->
+    <!-- TITLE -->
     <h2 class="text-center mb-4">👷 Worker Management</h2>
 
-    <!-- Home Button -->
+    <!-- NAVIGATION -->
     <div class="text-center mb-3">
         <a href="/" class="btn btn-dark">🏠 Home</a>
+        <a href="/dashboard/" class="btn btn-secondary">📊 Dashboard</a>
     </div>
 
-    <!-- Form -->
+    <!-- ADD WORKER -->
     <div class="card shadow p-4 mb-4">
         <form method="post">
             {% csrf_token %}
 
-            <input name="name" placeholder="Worker Name" class="form-control mb-3" required>
+            <input name="name"
+                   placeholder="Worker Name"
+                   class="form-control mb-3"
+                   required>
 
-            <input name="task" placeholder="Assigned Task" class="form-control mb-3" required>
+            <input name="task"
+                   placeholder="Assigned Task"
+                   class="form-control mb-3"
+                   required>
 
-            <button class="btn btn-success w-100">➕ Add Worker</button>
+            <button class="btn btn-success w-100">
+                ➕ Add Worker
+            </button>
         </form>
     </div>
 
-    <!-- Total Workers -->
+    <!-- TOTAL -->
     <div class="alert alert-info text-center">
         <strong>Total Workers:</strong> {{ data|length }}
     </div>
 
-    <!-- Worker List -->
+    <!-- LIST -->
     <h4 class="mb-3">📋 Worker List</h4>
 
     {% for i in data %}
-    <div class="card p-3 mb-2 shadow-sm worker-item">
-        <span><strong>{{ i.name }}</strong></span>
-        <span class="badge bg-success">{{ i.task }}</span>
+    <div class="card p-3 mb-3 shadow-sm worker-box">
+
+        <!-- LEFT -->
+        <div>
+            <strong>{{ i.name }}</strong><br>
+            <span class="task-badge">{{ i.task }}</span>
+        </div>
+
+        <!-- RIGHT -->
+        <form action="/delete-worker/{{ i.id }}/" method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger btn-sm">🗑</button>
+        </form>
+
     </div>
+
     {% empty %}
     <div class="alert alert-warning text-center">
         No workers added yet!

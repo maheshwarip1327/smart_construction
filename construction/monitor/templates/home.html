@@ -8,7 +8,7 @@
 <style>
 body {
     background: linear-gradient(135deg, #74ebd5, #acb6e5);
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Navbar */
@@ -16,16 +16,24 @@ body {
     border-radius: 0 0 15px 15px;
 }
 
-/* Hero Section */
+/* Hero */
 .hero {
     text-align: center;
-    padding: 80px 20px;
+    padding: 60px 20px;
 }
 
 /* Image */
 .hero img {
-    width: 130px;
+    width: 120px;
     margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
 }
 
 /* Title */
@@ -41,26 +49,33 @@ p {
 
 /* Buttons */
 .btn-custom {
-    padding: 14px 28px;
-    font-size: 18px;
+    padding: 14px 26px;
+    font-size: 16px;
     border-radius: 12px;
     transition: 0.3s;
     font-weight: bold;
 }
 
 .btn-custom:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
-/* Card Style */
+/* Feature Cards */
 .feature-card {
-    border-radius: 15px;
-    padding: 20px;
+    border-radius: 20px;
+    padding: 25px;
     transition: 0.3s;
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
+}
+
+/* Footer */
+.footer {
+    margin-top: 50px;
+    text-align: center;
+    color: #333;
 }
 </style>
 
@@ -68,21 +83,23 @@ p {
 
 <body>
 
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark px-4">
+    <span class="navbar-brand mb-0 h5">🏗️ Construction System</span>
+</nav>
 
-<!-- HERO SECTION -->
+<!-- HERO -->
 <div class="container hero">
 
-    <!-- Image -->
     <img src="https://cdn-icons-png.flaticon.com/512/1995/1995574.png">
 
-    <!-- Title -->
-    <h1 class="mb-3">🏗️ Construction Monitoring System</h1>
+    <h1 class="mb-3">Construction Monitoring System</h1>
 
-    <p class="mb-5 text-dark">
+    <p class="mb-4 text-dark">
         Manage projects, workers, materials and budget easily in one place.
     </p>
 
-    <!-- Buttons -->
+    <!-- BUTTONS -->
     <div class="d-flex justify-content-center gap-3 flex-wrap mb-5">
 
         <a href="/project/" class="btn btn-primary btn-custom">📁 Project</a>
@@ -97,37 +114,42 @@ p {
 
     </div>
 
-    <!-- Feature Section -->
+    <!-- FEATURES -->
     <div class="row g-4">
 
         <div class="col-md-3">
-            <div class="feature-card bg-light shadow">
+            <div class="feature-card bg-light shadow text-center">
                 <h5>📁 Projects</h5>
                 <p>Track construction progress easily</p>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="feature-card bg-light shadow">
+            <div class="feature-card bg-light shadow text-center">
                 <h5>👷 Workers</h5>
                 <p>Manage worker tasks efficiently</p>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="feature-card bg-light shadow">
+            <div class="feature-card bg-light shadow text-center">
                 <h5>🧱 Materials</h5>
                 <p>Maintain inventory records</p>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="feature-card bg-light shadow">
+            <div class="feature-card bg-light shadow text-center">
                 <h5>💰 Budget</h5>
                 <p>Track expenses and costs</p>
             </div>
         </div>
 
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer mt-5">
+        <p>© 2026 Construction Monitoring System</p>
     </div>
 
 </div>

@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 800px;
 }
 
 .card {
@@ -23,22 +23,16 @@ body {
     transform: scale(1.02);
 }
 
+.progress {
+    height: 10px;
+}
+
 h2 {
     font-weight: bold;
 }
 
 .btn:hover {
     transform: scale(1.05);
-}
-
-.project-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.progress-badge {
-    font-size: 14px;
 }
 </style>
 
@@ -48,49 +42,87 @@ h2 {
 
 <div class="container mt-5">
 
-    <!-- Title -->
+    <!-- TITLE -->
     <h2 class="text-center mb-4">📁 Project Management</h2>
 
-    <!-- Home Button -->
+    <!-- NAVIGATION -->
     <div class="text-center mb-3">
         <a href="/" class="btn btn-dark">🏠 Home</a>
+        <a href="/dashboard/" class="btn btn-secondary">📊 Dashboard</a>
     </div>
 
-    <!-- Form -->
-    <div class="card shadow p-4 mb-4">
+    <!-- ADD PROJECT -->
+    <div class="card p-4 mb-4 shadow">
         <form method="post">
             {% csrf_token %}
 
-            <input name="name" placeholder="Project Name" class="form-control mb-3" required>
+            <input name="name"
+                   class="form-control mb-3"
+                   placeholder="Project Name"
+                   required>
 
-            <input name="progress" placeholder="Progress (e.g. 60%)" class="form-control mb-3" required>
+            <input name="progress"
+                   type="number"
+                   min="0"
+                   max="100"
+                   class="form-control mb-3"
+                   placeholder="Progress (0-100)"
+                   required>
 
-            <button class="btn btn-primary w-100">➕ Add Project</button>
+            <button type="submit" class="btn btn-primary w-100">
+                ➕ Add Project
+            </button>
         </form>
     </div>
 
-    <!-- Total -->
+    <!-- TOTAL -->
     <div class="alert alert-info text-center">
         <strong>Total Projects:</strong> {{ data|length }}
     </div>
 
-    <!-- Project List -->
-    <h4 class="mb-3">📋 Project List</h4>
-
+    <!-- LIST -->
     {% for i in data %}
-    <div class="card p-3 mb-2 shadow-sm project-item">
+    <div class="card p-3 mb-3 shadow-sm">
 
-        <span><strong>{{ i.name }}</strong></span>
+        <!-- TOP -->
+        <div class="d-flex justify-content-between align-items-center">
 
-        <span class="badge bg-success progress-badge">
-            {{ i.progress }}
-        </span>
+            <strong>{{ i.name }}</strong>
+
+            <div class="d-flex gap-2">
+
+                <!-- EDIT -->
+                <a href="/edit/{{ i.id }}/"
+                   class="btn btn-warning btn-sm">✏️</a>
+
+                <!-- DELETE (SAFE POST) -->
+                <form action="/delete/{{ i.id }}/" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button class="btn btn-danger btn-sm">🗑</button>
+                </form>
+
+                <!-- BUDGET -->
+                <a href="/budget/?project={{ i.id }}"
+                   class="btn btn-success btn-sm">💰</a>
+
+            </div>
+
+        </div>
+
+        <!-- PROGRESS BAR -->
+        <div class="progress mt-3">
+    <div class="progress-bar bg-success"
+         style="width: 50%;">
+         {{ i.progress }}%
+    </div>
+</div>
+</div>
 
     </div>
 
     {% empty %}
     <div class="alert alert-warning text-center">
-        No projects added yet!
+        No projects yet!
     </div>
     {% endfor %}
 
