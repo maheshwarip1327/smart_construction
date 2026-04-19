@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Project, Worker, Material, Budget
+from django.db.models import Sum
+from .models import Budget
 
 
 # 🏠 HOME
@@ -92,67 +94,57 @@ def delete_material(request, id):
     obj.delete()
     return redirect('/material/')
 
+
+from .models import Budget, Project
+
+# 🧱 BUDGET VIEW (MAIN LOGIC)
 def budget(request):
     project = Project.objects.first()
 
-    if not project:
-        return render(request, 'budget.html', {
-            'data': [],
-            'total': 0
-        })
-
-    # 🔥 ADD EXPENSE
     if request.method == "POST":
-        desc = request.POST.get('desc')
-        amount = request.POST.get('amount')
+        desc = request.POST.get("desc")
+        amount = request.POST.get("amount")
 
-        if desc and amount:
-            desc = desc.lower()
+        try:
+            amount = int(amount)
+        except:
+            amount = 0
 
-            try:
-                amount = int(amount)
-            except:
-                amount = 0
+        obj = Budget.objects.filter(project=project, desc=desc).first()
 
-            obj = Budget.objects.filter(project=project, desc=desc).first()
+        if obj:
+            obj.amount += amount
+            obj.save()
+        else:
+            Budget.objects.create(project=project, desc=desc, amount=amount)
 
-            if obj:
-                obj.amount += amount
-                obj.save()
-            else:
-                Budget.objects.create(
-                    project=project,
-                    desc=desc,
-                    amount=amount
-                )
+        # ✅ IMPORTANT: reset flag after new entry
+        request.session['reset_total'] = False
 
         return redirect('/budget/')
 
-    data = Budget.objects.filter(project=project)
+    data = Budget.objects.all()
 
-    # 🔥 NORMAL TOTAL
-    total = sum(i.amount for i in data)
+    total = data.aggregate(Sum('amount'))['amount__sum'] or 0
 
-    # 🔥 RESET CHECK
-    if request.session.get('reset'):
+    # show reset only if active
+    if request.session.get('reset_total'):
         total = 0
 
     return render(request, 'budget.html', {
         'data': data,
         'total': total
     })
-
-
-# 🔥 RESET FUNCTION
+# 🔄 RESET TOTAL (SOFT RESET)
 def reset_budget(request):
-    request.session['reset'] = True
+    request.session['reset_total'] = True
     return redirect('/budget/')
-# 🗑 DELETE BUDGET
-def delete_budget(request, id):
-    budget = get_object_or_404(Budget, id=id)
-    budget.delete()
-    return redirect('budget')
 
+
+# 🗑 DELETE SINGLE ITEM
+def delete_budget(request, id):
+    Budget.objects.get(id=id).delete()
+    return redirect('/budget/')
 # 📊 DASHBOARD
 def dashboard(request):
     return render(request, 'dashboard.html', {
