@@ -24,7 +24,13 @@ body {
 }
 
 .progress {
-    height: 10px;
+    height: 12px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    font-size: 12px;
+    line-height: 12px;
 }
 
 h2 {
@@ -80,7 +86,7 @@ h2 {
         <strong>Total Projects:</strong> {{ data|length }}
     </div>
 
-    <!-- LIST -->
+    <!-- PROJECT LIST -->
     {% for i in data %}
     <div class="card p-3 mb-3 shadow-sm">
 
@@ -95,7 +101,7 @@ h2 {
                 <a href="/edit/{{ i.id }}/"
                    class="btn btn-warning btn-sm">✏️</a>
 
-                <!-- DELETE (SAFE POST) -->
+                <!-- DELETE -->
                 <form action="/delete/{{ i.id }}/" method="post" style="display:inline;">
                     {% csrf_token %}
                     <button class="btn btn-danger btn-sm">🗑</button>
@@ -112,14 +118,13 @@ h2 {
         <!-- PROGRESS BAR -->
         <div class="progress mt-3">
     <div class="progress-bar bg-success"
-         style="width: 50%;">
-         {{ i.progress }}%
+         role="progressbar"
+         style="width: {{ i.progress }}%;">
+        {{ i.progress }}%
     </div>
-</div>
 </div>
 
     </div>
-
     {% empty %}
     <div class="alert alert-warning text-center">
         No projects yet!

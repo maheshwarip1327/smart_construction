@@ -13,8 +13,7 @@ def home(request):
 def project(request):
     if request.method == "POST":
         name = request.POST.get('name')
-        progress = request.POST.get('progress')
-
+        progress = int(request.POST.get('progress', 0))
         try:
             progress = int(progress)
         except (TypeError, ValueError):
